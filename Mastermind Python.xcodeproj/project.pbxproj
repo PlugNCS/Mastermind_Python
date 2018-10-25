@@ -6,10 +6,15 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXFileReference section */
+		ED069142218212FF008DA210 /* Mastermind.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = Mastermind.py; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		ED069137218212A6008DA210 = {
 			isa = PBXGroup;
 			children = (
+				ED069142218212FF008DA210 /* Mastermind.py */,
 			);
 			sourceTree = "<group>";
 		};
