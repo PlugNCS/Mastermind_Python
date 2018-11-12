@@ -51,6 +51,12 @@ while showMainMenu == True:
             # We initialize our Arrays that will be useful to avoid to count two times the same peg. They will be filled once the peg have been taken into account to allow us to check if we already did the verification or not.
             Apepegs = []
             Apapegs = []
+            hs = 0
+            while hs < size:
+                Apapegs.append(-1)
+                Apepegs.append(-1)
+                # For diagnostics purposes only: print(code[i])
+                hs += 1
 
             # Simple indicator to know if the player won or not
             win = False
@@ -73,14 +79,21 @@ while showMainMenu == True:
                         Apepegs[cnt] = acode[cnt]
                     cnt += 1
                 
-                # Here, we check for the number of partial pegs.
+                # Here, we check for the number of partial pegs. This script is slower than the previous one but is way more accurate.
+                
                 generalcounter = 0
                 while generalcounter < size:
                     specificcounter = 0
-                    while specificcounter < size:
-                        if int(acode[generalcounter]) == int(code[specificcounter]) and int(acode[generalcounter]) != int(code[generalcounter]) and int(acode[generalcounter]) != int(Apapegs[generalcounter]):
+                    alreadyFound = False
+                    while specificcounter < size and alreadyFound == False:
+                        if int(acode[generalcounter]) == int(Apapegs[specificcounter]):
+                            alreadyFound = True
+                        specificcounter += 1
+                    specificcounter = 0
+                    while specificcounter < size and alreadyFound == False:
+                        if int(acode[generalcounter]) == int(code[specificcounter]):
+                            Apapegs[papegs] = acode[generalcounter]
                             papegs += 1
-                            Apapegs[generalcounter] = acode[generalcounter]
                         specificcounter += 1
                     generalcounter += 1
                 
@@ -103,7 +116,7 @@ while showMainMenu == True:
                 lostG += 1
 
             # Now it's time to ask the user what does he want to do next and do what he wants.
-            end = str(input("\n\nWhat do you want to do next? Reply \"replay\" to play a new game, reply \"menu\" to go back to the main menu or reply \"exit\" to quit the program."))
+            end = str(input("\n\nWhat do you want to do next? Reply \"replay\" to play a new game, reply \"menu\" to go back to the main menu or reply \"exit\" to quit the program: "))
             if end == "replay":
                 isPlaying = True
                 showMainMenu = True
