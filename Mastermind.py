@@ -134,6 +134,8 @@ while showMainMenu == True:
                 # Round finished, we reset the pegs counter.
                 papegs = 0
                 pepegs = 0
+                Apepegs = [] * size
+                Apepegs = [] * size
             # We stop the timer here.
             t1 = time.time()
             total = t1 - t0
