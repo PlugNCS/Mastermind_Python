@@ -24,6 +24,7 @@ while showMainMenu == True:
                 colors = int(input("How many colours do you want? "))
                 size = int(input("How long should the size of the code be? "))
                 attempts = int(input("How many maximal attemps do you want? "))
+                multiplayer = str(input("Do you want to enable multiplayer mode ? If so, reply \"yes\": "))
                 # The aibility to continue playing without restarting the game and giving the possibility to change the settings for the next game or save them, helping to show a global scoreboard at the end of the program is considered as the fourth improvement over the basic requirements.
                 save = str(input("Do you wish to save those settings for the rest of the execution of the program? This means that if you reply \"yes\", you will have to quit the program to change these settings. If not, then reply \"no\" and we will ask you at every new game to enter the settings again: "))
             elif save == "yes":
@@ -32,13 +33,38 @@ while showMainMenu == True:
             else:
                 print("An unknown error occured while retriving the save status of your settings. The programm will likely crash.")
 
-            # Code generation
-            code = []
-            i = 0
-            while i < size:
-                code.append(random.randint(0, colors))
-                # For diagnostics purposes only: print(code[i])
-                i += 1
+            # Code generation by another player (multiplayer-like experience) is considered as the fifth imorovement over the basic requirements.
+            if multiplayer == "yes" or multiplayer == "Yes" or multiplayer == "YES":
+                code = []
+                i = 0
+                print(str(name) + ", please look behind you and call the codemaker... You're the codemaker now. Make sure " + str(name) + " isn't cheating. Now, please think about a code that should be " + str(size) + " characters long. If your code is shorter than that, type \"skip\" to generate the rest of the code automatically: ")
+                character = 0
+                while i < size and str(character) != "skip":
+                    character = input("Character number " + str(i+1) + " out of " + str(size) + ": ")
+                    if str(character) != "skip":
+                        if int(character) >= 0 and int(character) <= int(colors):
+                            code.append(character)
+                            # For diagnostics purposes only: print(code[i])
+                        else:
+                            print("Error : could not check that the provided peg is equal or superior to zero and equal or inferior to ", colors, ": Please try again.")
+                            i -= 1
+                    else:
+                        code.append(random.randint(0, colors))
+                        # For diagnostics purposes only: print(code[i])
+                    i += 1
+                while i < size and str(character) == "skip":
+                    code.append(random.randint(0, colors))
+                    # For diagnostics purposes only: print(code[i])
+                    i += 1
+                
+                print("Okay, now please ask ", name, " to come back. He is the codebreaker. Don't give him any hint.\n")
+            else:
+                code = []
+                i = 0
+                while i < size:
+                    code.append(random.randint(0, colors))
+                    # For diagnostics purposes only: print(code[i])
+                    i += 1
 
             # The game can now start, we start the timer
             count = 0
@@ -67,32 +93,34 @@ while showMainMenu == True:
                 gcode = input("Attempt number " + str(count) + ": Enter the code: ")
                 # Read the code provided by the user
                 acode = list(gcode)
+                
+                # We replace the eventually missing values by -1 if necessary, so there is no chance that not providing the characters will help the player.
+                hd = 0
+                while hd < size:
+                    acode.append(-1)
+                    hd += 1
+                
                 cnt = 0
-                # Here, we check for the number of perfects pegs.
+                # Here, we check for the number of perfects pegs. This is the second-gen script which is shorter and simpler thanks to the pepegs and papegs variables reinitialisation after each loop.
                 while cnt < size :
                     # For diagnostics purposes only: print (code[cnt])
                     # For diagnostics purposes only: print (acode[cnt])
-                    # For diagnostics purposes only: print(acode[cnt], " match ", code[cnt])
-                    if int(acode[cnt]) == int(code[cnt]) and int(acode[cnt]) != int(Apepegs[cnt]):
+                    # For diagnostics purposes only: print(acode[cnt], " match ", code[cnt], " versus ", Apepegs[cnt])
+                    if int(acode[cnt]) == int(code[cnt]):
                         # For diagnostics purposes only: print("found one match.")
                         pepegs += 1
-                        Apepegs[cnt] = acode[cnt]
                     cnt += 1
                 
-                # Here, we check for the number of partial pegs. This script is slower than the previous one but is way more accurate.
+                # Here, we check for the number of partial pegs. This is the third-gen script that has been optimized thanks to a smart usage of a third array that will reconstruct the original code from the given code. That means that if you have the maximal value of partial pegs, Apapegs[] is identical to code[] on the selected interval.
                 
                 generalcounter = 0
                 while generalcounter < size:
                     specificcounter = 0
                     alreadyFound = False
                     while specificcounter < size and alreadyFound == False:
-                        if int(acode[generalcounter]) == int(Apapegs[specificcounter]):
+                        if int(acode[generalcounter]) == int(code[specificcounter]) and int(acode[generalcounter]) != int(Apapegs[specificcounter]):
+                            Apapegs[specificcounter] = acode[generalcounter]
                             alreadyFound = True
-                        specificcounter += 1
-                    specificcounter = 0
-                    while specificcounter < size and alreadyFound == False:
-                        if int(acode[generalcounter]) == int(code[specificcounter]):
-                            Apapegs[papegs] = acode[generalcounter]
                             papegs += 1
                         specificcounter += 1
                     generalcounter += 1
@@ -102,17 +130,20 @@ while showMainMenu == True:
                     win = True
                 else:
                     print("You have found ", pepegs, " perfect pegs and ", papegs, " partial pegs. You have ", attempts-count, " attempts left.")
-            
+        
+                # Round finished, we reset the pegs counter.
+                papegs = 0
+                pepegs = 0
             # We stop the timer here.
             t1 = time.time()
             total = t1 - t0
 
             # Finally, we check if the user won or not and inform him about the score.
             if win == True:
-                print("Congratulations! You won the game in ", count, " attempts and it took you ", total, " seconds to finish the game.")
+                print("Congratulations ", name, "! You won the game in ", count, " attempts and it took you ", total, " seconds to finish the game.")
                 winG += 1
             else:
-                print("Oh no! You didn't make it. Next time, you'll surely perform better! Just to inform you, it took you ", total, " seconds to finish the game.")
+                print("Oh no! You didn't make it, ", name, ". Next time, you'll surely perform better! Just to inform you, it took you ", total, " seconds to finish the game.")
                 lostG += 1
 
             # Now it's time to ask the user what does he want to do next and do what he wants.
